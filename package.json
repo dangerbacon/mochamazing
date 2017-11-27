@@ -16,8 +16,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://dangerbacon@bitbucket.org/dangerbacon/mochamazing.git"
+    "url": "git+https://github.com/dangerbacon/mochamazing.git"
   },
   "author": "Jeff Bacon <npm@psyci.com> (https://github.com/dangerbacon)",
-  "homepage": "https://bitbucket.org/dangerbacon/mochamazing#readme"
+  "homepage": "https://github.com/dangerbacon/mochamazing"
 }
