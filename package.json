@@ -1,0 +1,23 @@
+{
+  "name": "mochamazing",
+  "version": "1.0.0",
+  "description": "A beautiful and minimalist Mocha HTML reporter.",
+  "main": "reporter.js",
+  "scripts": {
+    "make-test-report": "node node_modules/mocha/bin/mocha --reporter ../../.. stub-tests/*.js"
+  },
+  "author": "Jeff Bacon <npm@psyci.com> (https://github.com/dangerbacon)",
+  "license": "WTFPL",
+  "dependencies": {
+    "mocha": "*",
+    "json-stringify-safe": "*",
+    "xplates": "*",
+    "xplates-string-table": "*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://dangerbacon@bitbucket.org/dangerbacon/mochamazing.git"
+  },
+  "author": "Jeff Bacon <npm@psyci.com> (https://github.com/dangerbacon)",
+  "homepage": "https://bitbucket.org/dangerbacon/mochamazing#readme"
+}

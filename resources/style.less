@@ -1,0 +1,417 @@
+
+/* ################################################################################
+VARIABLES
+################################################################################ */
+@color-fail: #F44336;
+@color-skip: #03A9F4;
+@color-pass: #4CAF50;
+@color-hook: #9C27B0;
+
+@color-foreground: #000000;
+@color-background: #ffffff;
+@color-base: #E1E2E1;
+@color-bar: #F5F5F5;
+@color-deep: #3F51B5;
+@color-deepfore: #FFFFFF;
+
+@color-primary:      mix(@color-foreground, @color-background, 87%);
+@color-secondary:    mix(@color-foreground, @color-background, 54%);
+@color-disabled:     mix(@color-foreground, @color-background, 38%);
+@color-dividers:     mix(@color-foreground, @color-background, 12%);
+
+@font-xl: 48px; @line-xl: 60px;
+@font-l: 36px;  @line-l: 40px;
+@font-s: 16px;  @line-s: 20px;
+@font-xs: 12px; @line-xs: 16px;
+
+@box-pad: 16px;
+@output-pad: 8px;
+@tocbutton: 40px;
+@mainpadding: 32px;
+
+
+/* ################################################################################
+CSS RESET
+################################################################################ */
+a,abbr,acronym,address,applet,article,aside,audio,b,big,blockquote,body,canvas,caption,center,cite,code,dd,del,details,dfn,div,dl,dt,em,embed,fieldset,figcaption,figure,footer,form,h1,h2,h3,h4,h5,h6,header,hgroup,html,i,iframe,img,ins,kbd,label,legend,li,mark,menu,nav,object,ol,output,p,pre,q,ruby,s,samp,section,small,span,strike,strong,sub,summary,sup,table,tbody,td,tfoot,th,thead,time,tr,tt,u,ul,var,video{margin:0;padding:0;border:0;font:inherit;vertical-align:baseline}article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section{display:block}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:after,blockquote:before,q:after,q:before{content:'';content:none}table{border-collapse:collapse;border-spacing:0}
+
+
+/* ################################################################################
+FONT
+################################################################################ */
+@font-face
+{
+  font-family: mochamazing-icons;
+  src: data-uri('application/x-font-woff;charset=utf-8;base64', 'icon-font.woff') format('woff');
+}
+
+
+/* ################################################################################
+TOP LEVEL ELEMENTS
+################################################################################ */
+html
+{
+  @media screen
+  {
+    background: @color-base;    
+    color: @color-primary;
+  }
+  font-family: sans-serif;
+  overflow-y: scroll;
+}
+main
+{
+  padding: (@mainpadding - @box-pad) @mainpadding @mainpadding @mainpadding;
+}
+
+/* ################################################################################
+ARTICLE ELEMENTS
+################################################################################ */
+
+article, .noncustom.bigstats > *, .table_of_contents .testlist
+{
+  @media screen
+  {
+    background: @color-background;
+    box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
+  }
+}
+article
+{
+  margin-top: @box-pad;
+}
+article article
+{
+  border: none;
+  box-shadow: none;
+  margin-top: 0px;
+  border-top: 1px solid @color-dividers;
+}
+.table_of_contents article { margin-top: 0px; border: none !important; box-shadow: none; }
+.table_of_contents article h2 { background: transparent !important; cursor: pointer; }
+
+@subset-padding: 16px;
+.noncustom
+{
+  article > article > *:not(article)                                         { padding-left: 1*@subset-padding; }
+  article > article > article > *:not(article)                               { padding-left: 2*@subset-padding; }
+  article > article > article > article > *:not(article)                     { padding-left: 3*@subset-padding; }
+  article > article > article > article > article > *:not(article)           { padding-left: 4*@subset-padding; }
+  article > article > article > article > article > article > *:not(article) { padding-left: 5*@subset-padding; }
+}
+.table_of_contents .testlist { margin-top: @box-pad; }
+
+/* ################################################################################
+TEST ELEMENTS
+################################################################################ */
+.noncustom
+{
+  output
+  {
+    position: relative;
+    display: block;
+    border-top: 1px solid @color-dividers;
+    overflow: hidden;
+
+    font-size: @font-s;
+    line-height: @line-s;
+  }
+  output:not([ma-ne]) h3
+  {
+    cursor: pointer;
+    border-left: 4px solid transparent;
+    transition: border-left-color 64ms linear 0ms, background-color 64ms linear 0ms;
+  }
+  output[ma-i]:not([ma-ne]) h3:hover { border-left-color: @color-disabled;  background-color: fade(@color-disabled, 10%); }
+  output[ma-p]:not([ma-ne]) h3:hover { border-left-color: @color-pass;      background-color: fade(@color-pass, 10%); }
+  output[ma-f]:not([ma-ne]) h3:hover { border-left-color: @color-fail;      background-color: fade(@color-fail, 10%); }
+  output[ma-s]:not([ma-ne]) h3:hover { border-left-color: @color-skip;      background-color: fade(@color-skip, 10%); }
+  output[ma-h]:not([ma-ne]) h3:hover { border-left-color: @color-hook;      background-color: fade(@color-hook, 10%); }
+  
+  .table_of_contents & output { display: none; }
+}
+
+/* ################################################################################
+HEADER ELEMENTS
+################################################################################ */
+
+.noncustom
+{
+  h1, h2
+  {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+  h1
+  {
+  
+    font-size: @font-l;
+    line-height: @line-l;
+    padding: @mainpadding;
+    @media screen
+    {
+      background: @color-deep;
+      color: @color-deepfore;
+      box-shadow: 0px 4px 12px rgba(0,0,0,0.2);
+    }
+    i { font-size: @font-s; line-height: @line-s; }
+  }
+  h2
+  {
+    media screen
+    {
+      background-color: @color-bar;
+    }
+    padding: @output-pad;
+    margin: 0px;
+  }
+  h2 i
+  {
+    font-size: @font-xs;
+    line-height: @line-xs;
+    color: @color-disabled;
+    font-weight: normal;
+    &:before { content: ' ('; }
+    &:after { content: ')'; }
+  }
+  h3
+  {
+    padding: @output-pad 32px @output-pad @output-pad;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  output.test_open h3 { white-space: normal; }
+
+  article h2 { font-size: 18px; font-weight: bold; }
+  article article h2 { font-size: 16px; }
+}
+
+/* ################################################################################
+TIMES
+################################################################################ */
+.noncustom
+{
+  time
+  {
+    position: absolute;
+    right: @output-pad;
+    color: @color-disabled;
+    font-size: @font-xs;
+    line-height: @line-s;
+  }
+  time:after
+  {
+    content: 'ms';
+  }
+  time[ma-slow]
+  {
+    color: red;
+  }
+}
+
+/* ################################################################################
+ERROR MESSAGES
+################################################################################ */
+.noncustom
+{
+  s
+  {
+    display: inline;
+    text-decoration: none;
+    color: @color-fail;
+  }
+  s:before { content: ' ('; }
+  s:after { content: ' )'; }
+}
+
+/* ################################################################################
+OUTPUT BLOCK
+################################################################################ */
+.noncustom
+{
+  blockquote
+  {
+    padding: 0px @output-pad @output-pad 24px;
+    color: @color-secondary;
+
+    &:not([ma-info]) { display: none; }
+  }
+  blockquote > h4
+  {
+    margin: 4px 0px;
+    font-weight: bold;
+  }
+  blockquote > *:not(h4)
+  {
+    border-left: 2px solid @color-base;
+    padding-left: @output-pad;
+  }
+  blockquote > h4 > em
+  {
+    font-weight: normal;
+  }
+  output.test_open blockquote
+  {
+    display: block;
+  }
+}
+
+/* ################################################################################
+CODE BLOCKS
+################################################################################ */
+.noncustom
+{
+  pre
+  {
+    white-space: pre-wrap;
+    font-family: monospace;
+  }
+}
+
+/* ################################################################################
+ICONS
+################################################################################ */
+.noncustom
+{
+  var:before
+  {
+    display: inline-block;
+    font-family: mochamazing-icons;
+    vertical-align: top;
+    text-align: center;
+  }  
+  [ma-p] var:before { content: '√'; color: @color-pass; }
+  [ma-f] var:before { content: 'X'; color: @color-fail; }
+  [ma-s] var:before { content: '∅'; color: @color-skip; }
+  [ma-h] var:before { content: 'H'; color: @color-hook; }  
+  .tocbutton:before { content: '☰'; }  
+  h3 var:before
+  {
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+    font-size: 20px;
+    margin-right: @output-pad;
+  }
+}
+
+/* ################################################################################
+STATS & TYPE TOGGLES
+################################################################################ */
+.noncustom
+{
+  &.stats *[ma-p] { color: @color-pass; }
+  &.stats *[ma-f] { color: @color-fail; }
+  &.stats *[ma-s] { color: @color-skip; }
+  &.stats *[ma-h] { color: @color-hook; }
+
+  &.stats > span, & .stats > span
+  {
+    display: inline-block;
+    cursor: pointer;
+    position: relative;
+  }
+  &.bigstats
+  {
+    display: flex;
+    margin-top: @box-pad;
+    & > *
+    {
+      flex: 1;
+      flex-basis: 0;
+      text-align: center;
+      border-bottom: 8px solid currentColor;
+      font-size: @font-xl; line-height: @line-xl;
+      padding: @box-pad 0px;
+      transition: opacity 256ms linear 0ms !important;
+    }
+    & > *:not(:first-child)
+    {
+      margin-left: @box-pad;
+    }
+    .table_of_contents & { display: none; }
+  }
+  &.bigstats > span:after
+  {
+    content: 'SHOW / HIDE';
+    white-space: nowrap;
+    font-size: @font-xs; line-height: @line-xs;
+    position: absolute;
+    bottom: 4px;
+    left: -20px;
+    right: -20px;
+    text-align: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 128ms linear 0ms;
+  }
+  &.bigstats > span:hover:after
+  {
+    opacity: 1;
+  }
+
+  body.hide-ma-p & *[ma-p],
+  body.hide-ma-f & *[ma-f],
+  body.hide-ma-s & *[ma-s],
+  body.hide-ma-h & *[ma-h]
+  {
+    opacity: 0.2;
+  }
+  body.hide-ma-p & output[ma-p],
+  body.hide-ma-f & output[ma-f],
+  body.hide-ma-s & output[ma-s],
+  body.hide-ma-h & output[ma-h]
+  {
+    display: none;
+  }
+}
+
+/* ################################################################################
+ERROR MESSAGES
+################################################################################ */
+.err { color: @color-fail; }
+
+/* ################################################################################
+COMPRESSED BLOCKS
+################################################################################ */
+.noncustom
+{
+  samp { display: none; }
+}
+
+.noncustom .tocbutton
+{
+  display: block;
+  text-align: center;
+  font-size: 32px;
+  
+  position: fixed;
+  bottom: (@mainpadding - @tocbutton/2);
+  right: (@mainpadding - @tocbutton/2);
+  height: @tocbutton;
+  width: @tocbutton;
+  border-radius: @tocbutton;
+  color: #ffffff;
+  
+  box-shadow: 0px 4px 12px rgba(0,0,0,0.2);
+  z-index: 999;
+  
+  background: @color-deep;
+  font-size: (@tocbutton * 0.6);
+  line-height: (@tocbutton * 1.1);
+  vertical-align: top;
+  cursor: pointer;
+  
+  media print { display: none; }
+}
+
+/* ################################################################################
+CUSTOM BLOCKS
+################################################################################ */
+.custom
+{
+  margin-top: @box-pad;
+  .table_of_contents & { display: none; }
+}

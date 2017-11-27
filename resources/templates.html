@@ -1,0 +1,188 @@
+xplates:report():
+  <!DOCTYPE html>
+  <% var stats = new MochamazingStats(); %>
+  <%@ body_html %>    
+    <%% suite(stats, { title: "Global",
+        _beforeAll: runner.suite._beforeAll,
+        _beforeEach: runner.suite._beforeEach,
+        _afterEach: runner.suite._afterEach}) %>
+    <%% suites(stats, runner.suite.suites) %>
+    <%% suite(stats, { title: "Global",
+        _afterAll: runner.suite._afterAll }) %>    
+  <%@%>
+  <html>
+    <%% header() %>
+    <%
+      var bodyclass = [];
+      if (options.hooks === "hidden") bodyclass.push("hide-ma-h");
+      if (options.skips === "hidden") bodyclass.push("hide-ma-s");
+    %>
+    <body class="<%= bodyclass.join(" ") %>">          
+      <div class="noncustom"><var class="tocbutton"></var><h1><%= options.reportTitle %><i><%= options.reportSubtitle %></i></h1></div>
+      <main>        
+        <%% custom(options.htmlHeader) %>
+        <%% stats(stats,"bigstats noncustom") %>
+        <%% custom(options.htmlSummary) %>
+        <div class="noncustom testlist"><%== body_html %></div>
+        <%% custom(options.htmlFooter) %>
+      </main>
+    </body>
+  </html>
+
+xplates:header():
+  <head>
+  <meta charset="utf-8">
+  <title><%= options.reportPageTitle || options.reportTitle %></title>
+  <style><%== mochamazing_css %></style>
+  <%? options.extraCSS %><style><%== options.extraCSS %></style><%?%>
+  <%? report_config.compression_used %>
+    <script>var LZString = (<%== makeLZString_src %>)();</script>    
+  <%?%>    
+  <script><%== mochamazing_js %></script>    
+  </head>
+
+xplates:suites(stats, suites):
+  <%~ suites||[] : : suite %><%? !suite.__ma_ignore %><%% suite(stats,suite) %><%?%><%~%>
+
+xplates:suite(stats, suite):
+  <% var substats = new MochamazingStats(); %>
+  <%@ suite_html %>
+    <%% suite_info(substats, suite) %>
+    <%% tests(substats, suite._beforeAll) %>
+    <%% tests(substats, suite._beforeEach) %>
+    <%% tests(substats, suite._afterEach) %>
+    <%% tests(substats, suite.tests) %>
+    <%% suites(substats, suite.suites) %>
+    <%% tests(substats, suite._afterAll) %>
+  <%@%>
+  <%? substats.all %>
+    <article>
+    <h2><span><%= suite.title %><%? suite.file && options.filenames %><i><%= require("path").basename(suite.file) %></i><%?%></span><%% stats(substats) %></h2>
+      <%== suite_html %>
+    </article>
+    <% stats.addIn(substats); %>
+  <%?%>
+
+
+xplates:suite_info(stats,suite):
+<%? (suite.__ma_notes||[]).length + (suite.__ma_contexts||[]).length %>
+  <%% test(stats, {
+    title: "Suite Information",
+    type: "info",
+    __ma_notes: suite.__ma_notes,
+    __ma_contexts: suite.__ma_contexts
+  }) %>
+<%?%>
+
+
+xplates:tests(stats,tests):
+  <%~ tests||[] : : test %><%? !test.__ma_ignore %><%% test(stats,test) %><%?%><%~%>
+
+xplates:test(stats,test):
+  <%
+    var attr;
+    if (test.state === "passed") { attr = "ma-p"; stats.addPass(); }
+    else if (test.state === "failed") { attr = "ma-f"; stats.addFail(); }
+    else if (test.type === "hook") { if (!options.hooks) return ""; attr = "ma-h"; stats.addHook(); }
+    else if (test.type === "info") { attr = "ma-i"; stats.addInfo(); }
+    else { if (!options.skips) return ""; attr = "ma-s"; stats.addSkip(); }
+  %>
+  <%@ details_html %><%% details(test) %><%@%><% if (!details_html) attr += " ma-ne"; %>
+<output <%== attr %>>
+  <h3><var></var><%= test.title %><%% err(test) %><%% duration(test) %></h3>
+  <%== details_html %>
+  <%% notes(test) %>
+</output>
+
+xplates:duration(test):
+  <%? typeof test.duration === "number" %><time><%= test.duration %></time><%?%>
+
+xplates:err(test):
+<%? test.err %><s><%% err_message(test.err) %></s><%?? test.hookErr %><s><%% err_message(test.hookErr) %></s><%?%>
+
+xplates:err_message(err):
+  <%=
+    (""+(typeof err === "string" ? err :
+    err.message ? err.message :
+    err.stack ? err.stack.split("\n")[0] :
+    err.code ? err.code :
+    err.name ? err.name :
+    "Error").trim())
+  %>
+
+xplates:details(obj):
+  <% var blocks = 0; %>
+  <%@ blockquote_html %>
+    <%? obj.err && obj.err.stack %><% blocks++ %>
+      <h4 class="err"><%= obj.err.name || "Error" %></h4>
+      <pre class="err"><%= obj.err.stack %></pre>
+    <%?%>
+    <%? obj.hookErr && obj.hookErr.stack %><% blocks++ %>
+      <h4 class="err">Hook <%= obj.hookErr.name || "Error" %></h4>
+      <pre class="err"><%= obj.hookErr.stack %></pre>
+    <%?%>
+    <%? options.code && obj.body %><% blocks++ %>
+      <h4>Code</h4>
+      <pre><%= obj.body || "N/A" %></pre>
+    <%?%>
+    <%~ obj.__ma_contexts||[] : idx : ctx %><% blocks++ %><%% context(ctx, idx, "Context") %><%~%>
+  <%@%>
+  <% if (!blocks) return ""; %>
+  <%? blockquote_html.length >= 1000 /* Only worth it around 1000chars */ %><% report_config.compression_used = true; %>
+  <samp><%== LZString.compressToEncodedURIComponent(blockquote_html) %></samp>
+  <%??%><blockquote><%== blockquote_html %></blockquote><%?%>
+
+xplates:notes(obj):
+  <%? (obj.__ma_notes||[]).length %>
+    <blockquote ma-info>
+      <%~ obj.__ma_notes||[] : idx : ctx %><%% context(ctx, idx, "Note") %><%~%>
+    </blockquote>
+  <%?%>
+
+
+
+xplates:dump(obj):
+  <xpre><%= json_stringify_safe(obj, null, "  ") %></pre>
+
+xplates:stats(stats, classname):
+  <div class="stats <%= classname||"" %>">
+    <%? stats.pass %><span ma-p><var><%= stats.pass %></var></span><%?%>
+    <%? stats.fail %><span ma-f><var><%= stats.fail %></var></span><%?%>
+    <%? stats.skip %><span ma-s><var><%= stats.skip %></var></span><%?%>
+    <%? stats.hook %><span ma-h><var><%= stats.hook %></var></span><%?%>
+  </div>
+
+xplates:context(prop, index, default_title):
+  <%
+    if (typeof prop !== "object" || prop === null) prop = { value: prop };
+    if (!prop.hasOwnProperty("value") && !prop.hasOwnProperty("htmlValue")) prop = { value: prop };
+    if (typeof prop.title !== "string") prop.title = default_title + " #" + (index+1);
+    var simple =
+      !prop.hasOwnProperty("value") ? null :
+      (typeof prop.value === "string" && prop.value.indexOf("\n") === -1) ? prop.value :
+      (typeof prop.value === "number" || typeof prop.value === "boolean" || typeof prop.value === "undefined") ? prop.value+"" :
+      (prop.value === null) ? "null" :
+      (prop.value instanceof Date) ? prop.value.toISOString() :
+      null;
+  %>
+  <%? simple !== null %>
+    <h4><%= prop.title %>: <em><%= simple %></em></h4>
+  <%??%>
+    <h4><%= prop.title %>:</h4>
+    <%? prop.hasOwnProperty("value") %>
+      <pre><%=
+        typeof prop.value === "string" ? prop.value :
+        typeof prop.value === "function" ? prop.value.toString() :
+        json_stringify_safe(prop.value, function(k,v) { return v === undefined ? "[undefined]" : v; }, "  ");
+      %></pre>
+    <%?%>
+    <%? prop.hasOwnProperty("htmlValue") %>
+      <%== prop.htmlValue %>
+    <%?%>
+<%?%>
+
+xplates:custom(html):
+  <%? html %>
+    <!-- Custom html -->
+    <div class="custom"><%== html %></div>
+  <%?%>
